@@ -14,12 +14,13 @@ const NoteState = (props) => {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       headers: {
         "Content-Type": "application/json",
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ1ZTNjMjc1ODgyODE4MmYyZGFiZGY5In0sImlhdCI6MTY4Mzg5ODI4MH0.AcZqoKphbQs4HFsP3TyElzhM1cqp94zHUT4qSLl1ZkI"
+        "auth-token": localStorage.getItem('token')
       },
       body: JSON.stringify({ title, description, tag }), // body data type must match "Content-Type" header
     });
     const json = await response.json();
     console.log("Adding a new note", json);
+    props.showAlert(`Saved the new note: ${title}`, "info"); //updates alert for adding notes. passed to NoteSate component from App.js
 
     const note = {
       "_id": "645f94cc684b63eac33a3a88",
@@ -36,14 +37,16 @@ const NoteState = (props) => {
   //Get all notes
   const getNotes = async () => {
     // API call
+    props.showAlert("Fetching your notes", "warning")
     const response = await fetch(`${host}/api/notes/fetchallnotes`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ1ZTNjMjc1ODgyODE4MmYyZGFiZGY5In0sImlhdCI6MTY4Mzg5ODI4MH0.AcZqoKphbQs4HFsP3TyElzhM1cqp94zHUT4qSLl1ZkI"
+        "auth-token": localStorage.getItem('token')
       }
     });
     const json = await response.json();
+    props.showAlert("Succesfully fetched your notes", "success")
     console.log(json);
     setNotes(json)
   }
@@ -55,7 +58,7 @@ const NoteState = (props) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ1ZTNjMjc1ODgyODE4MmYyZGFiZGY5In0sImlhdCI6MTY4Mzg5ODI4MH0.AcZqoKphbQs4HFsP3TyElzhM1cqp94zHUT4qSLl1ZkI"
+        "auth-token": localStorage.getItem('token')
       }
     });
     const json = await response.json();
@@ -63,7 +66,8 @@ const NoteState = (props) => {
     //Logic to delete in client
     console.log("Deleting a note with id: " + id);
     const newNotes = notes.filter((note) => { return note._id !== id })
-    setNotes(newNotes)
+    setNotes(newNotes);
+    props.showAlert("Note Deleted", "warning"); //updates alert for deleting notes. passed to NoteSate component from App.js
   }
 
   //EDIT a note
@@ -73,12 +77,13 @@ const NoteState = (props) => {
       method: "PUT", // *GET, POST, PUT, DELETE, etc.
       headers: {
         "Content-Type": "application/json",
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQ1ZTNjMjc1ODgyODE4MmYyZGFiZGY5In0sImlhdCI6MTY4Mzg5ODI4MH0.AcZqoKphbQs4HFsP3TyElzhM1cqp94zHUT4qSLl1ZkI"
+        "auth-token": localStorage.getItem('token')
       },
       body: JSON.stringify({ title, description, tag }), // body data type must match "Content-Type" header
     });
     const json = await response.json();
     console.log(json);
+    props.showAlert("Updated Successfully", "success")
 
 
     let newNotes = JSON.parse(JSON.stringify(notes)) 

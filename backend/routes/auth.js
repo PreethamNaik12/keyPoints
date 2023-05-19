@@ -11,15 +11,18 @@ const JWT_SECRET = 'hellobro'
 
 // ROUTE 1: Create a User using: POST "/api/auth/createuser". No login required
 router.post('/createuser', [
-    body('name', 'Please enter a valid name').isLength({ min: 3 }),
+    body('fname', 'Please enter a valid name').isLength({ min: 3 }),
     body('email', 'Please enter a valid name').isEmail(),
-    body('password', 'Enter password atleast 5 characters long').isLength({ min: 5 }),
+    body('crt_password', 'Enter password atleast 5 characters long').isLength({ min: 5 }),
 
 ], async (req, res) => {
+
+    let success=false;
+
     // If there are errors, return Bad request and the errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() })
+        return res.status(400).json({ success, errors: errors.array() })
     }
     // Check whether the user with this email exists already
 
@@ -28,13 +31,14 @@ router.post('/createuser', [
 
         let user = await User.findOne({ email: req.body.email });
         if (user) {
-            return res.status(400).json({ error: "Sorry a user with this email already exists" })
+            return res.status(400).json({ success, error: "Sorry a user with this email already exists" })
         }
         const salt = await bcrypt.genSalt(10);
-        const secPass = await bcrypt.hash(req.body.password, salt);
+        const secPass = await bcrypt.hash(req.body.crt_password, salt);
         //create a new user
         user = await User.create({
-            name: req.body.name,
+            firstName: req.body.fname,
+            lastName: req.body.lname,
             password: secPass,
             email: req.body.email
         });
@@ -46,8 +50,8 @@ router.post('/createuser', [
         }
         const authToken = jwt.sign(data , JWT_SECRET);
         console.log(authToken);
-
-        res.json({authToken});
+        success=true;
+        res.json({success, authToken});
     }
     //catch errors
     catch (error) {
@@ -63,6 +67,9 @@ router.post('/login', [
     body('password', 'Password cannot be blank').exists()
 
 ], async (req, res) => {
+
+    let success=false;
+
      // If there are errors, return Bad request and the errors
      const errors = validationResult(req);
      if (!errors.isEmpty()) {
@@ -78,7 +85,7 @@ router.post('/login', [
 
         const passwordCompare = await bcrypt.compare(password, user.password);
         if(!passwordCompare){
-            return res.status(400).json({error: "Please try to login with correct credentials"});
+            return res.status(400).json({success, error: "Please try to login with correct credentials"});
         }
 
         const data = {
@@ -88,8 +95,8 @@ router.post('/login', [
         }
         const authToken = jwt.sign(data , JWT_SECRET);
         console.log(authToken);
-
-        res.json({authToken});
+        success=true;
+        res.json({success, authToken, email});
 
     }
     catch (error) {

@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-export default function Navbar() {
+export default function Navbar(props) {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate("/login");
+    props.showAlert("Logged Out Successfully", "success")
+
+  }
   let location = useLocation();
   return (
     <div>
@@ -15,6 +23,9 @@ export default function Navbar() {
       <ul className="navbar-nav me-auto mb-2 mb-lg-0">
         <li className="nav-item">
           <Link className={`nav-link ${location.pathname === '/'?'active': '' }`} aria-current="page" to="/">Home</Link>
+        </li>
+        <li className="nav-item">
+          {localStorage.getItem('token') && <Link className={`nav-link ${location.pathname === '/addnote'?'active': '' }`} aria-current="page" to="/addnote">Create a note</Link>}
         </li>
         <li className="nav-item">
           <Link className={`nav-link ${location.pathname === '/about'?'active': '' }`} to="/about">About</Link>
@@ -34,10 +45,15 @@ export default function Navbar() {
           <a className="nav-link disabled">Disabled</a>
         </li> */}
       </ul>
-        <div className="form-check form-switch">
-            <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
-            <label className="form-check-label" htmlFor="flexSwitchCheckDefault"></label>
-        </div>
+        {localStorage.getItem('token') && <Link className='navbar-brand' to='/profile' style={{
+              "padding": "0.5em",
+              "background-color": "#333333",
+              "border-radius": "5px",
+        }}><small>{`${localStorage.getItem('email')}`}</small></Link>}
+        {!localStorage.getItem('token')? <div className="form-check form-switch">
+          <Link className="btn btn-info mx-2" role="button" to='/login'>Login</Link>
+          <Link className="btn btn-warning mx-2" role="button" to='/signup'>Sign Up</Link>
+        </div>: <button className="btn btn-danger mx-2" onClick={handleLogout}>Log Out</button>}
     </div>
   </div>
 </nav>
