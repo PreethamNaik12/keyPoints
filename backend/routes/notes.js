@@ -76,8 +76,8 @@ router.put('/updatenote/:id', fetchUser, async (req, res) => {
     }
 
 })
-
-// ROUTE 4: Delete a note using: DELETe "/api/notes/deletenote". Login required
+\
+// ROUTE 4: Delete a note using: DELETE "/api/notes/deletenote". Login required
 router.delete('/deletenote/:id', fetchUser, async (req, res) => {
     const { title, description, tag } = req.body;   //destructuring  
 
